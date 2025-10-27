@@ -16,10 +16,10 @@ type TokenPair = {
 };
 
 export class TokenService extends Service {
-	private static privateKeyPath = join(cwd(), "./privateKey.pem");
-	private static publicKeyPath = join(cwd(), "./publicKey.pem");
-	private static privateKey = readFile(this.privateKeyPath, "utf8");
-	private static publicKey = readFile(this.publicKeyPath, "utf8");
+	private static privateKeyPath = () => join(cwd(), "./privateKey.pem");
+	private static publicKeyPath = () => join(cwd(), "./publicKey.pem");
+	private static privateKey = () => readFile(this.privateKeyPath(), "utf8");
+	private static publicKey = () => readFile(this.publicKeyPath(), "utf8");
 	private static jwtAlgorithm: jwt.Algorithm = "RS256";
 	private static accessTokenMaxAge = "1h" as const;
 	private static refreshTokenMaxAge = "7d" as const;
@@ -85,7 +85,7 @@ export class TokenService extends Service {
 	}
 
 	static async verify(token: string): Promise<Payload> {
-		const publicKey = await this.publicKey;
+		const publicKey = await this.publicKey();
 
 		try {
 			return jwt.verify(token, publicKey, {
@@ -121,7 +121,7 @@ export class TokenService extends Service {
 	}
 
 	private static async createAccessToken(payload: Payload): Promise<string> {
-		const privateKey = await this.privateKey;
+		const privateKey = await this.privateKey();
 
 		return jwt.sign(payload, privateKey, {
 			algorithm: this.jwtAlgorithm,
@@ -130,7 +130,7 @@ export class TokenService extends Service {
 	}
 
 	private static async createRefreshToken(payload: Payload): Promise<string> {
-		const privateKey = await this.privateKey;
+		const privateKey = await this.privateKey();
 
 		return jwt.sign(payload, privateKey, {
 			algorithm: this.jwtAlgorithm,
