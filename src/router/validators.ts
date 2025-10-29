@@ -27,6 +27,7 @@ export const validateAuth = async (
 	res: Response
 ): Promise<boolean> => {
 	const { at: accessToken } = req.cookies;
+	// @TODO: Change TokenService to a utility function later
 	const { id } = await TokenService.verify(accessToken);
 
 	if (!id) {

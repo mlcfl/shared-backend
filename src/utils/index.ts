@@ -5,3 +5,4 @@ export * from "./initHTMLPagesRender";
 export * from "./initSSG";
 export * from "./initSSR";
 export * from "./onServerStarted";
+export * from "./verifyToken";
