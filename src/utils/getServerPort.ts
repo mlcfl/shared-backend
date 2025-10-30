@@ -14,5 +14,5 @@ export const getServerPort = (defaultPort = 7200): number => {
 		}
 	}
 
-	return Number(process.env.PORT) || defaultPort;
+	return Number(process.env.SERVER_PORT) || defaultPort;
 };
