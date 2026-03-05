@@ -1,3 +1,4 @@
+export * from "./expressErrorHandler";
 export * from "./getAppName";
 export * from "./getPresetType";
 export * from "./getServerPort";
