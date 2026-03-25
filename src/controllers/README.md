@@ -1,5 +1,0 @@
-# Controller
-
-## Description
-
-## Examples
