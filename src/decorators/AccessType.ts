@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import type { Request } from "express";
-import jwt from "jsonwebtoken";
+import { jwtVerify, importSPKI } from "jose";
 
 /**
  * The structure of the payload contained in a JWT access token.
@@ -42,13 +42,13 @@ const ACCESS_TYPE_KEY = "accessType";
  * @param publicKey - The public key used for verification.
  * @returns The decoded payload if the token is valid; otherwise, an empty object.
  */
-const verifyToken = (accessToken: string, publicKey: string) => {
+const verifyToken = async (accessToken: string, publicKey: string): Promise<Partial<AccessTokenPayload>> => {
 	try {
-		return jwt.verify(accessToken, publicKey, {
-			algorithms: ["RS256"],
-		}) as AccessTokenPayload;
+		const key = await importSPKI(publicKey, "RS256");
+		const { payload } = await jwtVerify<AccessTokenPayload>(accessToken, key);
+		return payload;
 	} catch {
-		return {} as AccessTokenPayload;
+		return {};
 	}
 };
 
@@ -56,7 +56,7 @@ const verifyToken = (accessToken: string, publicKey: string) => {
 class AccessTypeGuard implements CanActivate {
 	constructor(private readonly reflector: Reflector) {}
 
-	canActivate(context: ExecutionContext): boolean {
+	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const type = this.reflector.get<AccessTypes>(
 			ACCESS_TYPE_KEY,
 			context.getHandler(),
@@ -80,7 +80,7 @@ class AccessTypeGuard implements CanActivate {
 				throw new UnauthorizedException();
 			}
 
-			const { id } = verifyToken(req.cookies.at, publicKey);
+			const { id } = await verifyToken(req.cookies.at, publicKey);
 
 			if (!id) {
 				throw new UnauthorizedException();
