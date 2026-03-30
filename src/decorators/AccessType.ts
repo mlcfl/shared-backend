@@ -42,7 +42,10 @@ const ACCESS_TYPE_KEY = "accessType";
  * @param publicKey - The public key used for verification.
  * @returns The decoded payload if the token is valid; otherwise, an empty object.
  */
-const verifyToken = async (accessToken: string, publicKey: string): Promise<Partial<AccessTokenPayload>> => {
+const verifyToken = async (
+	accessToken: string,
+	publicKey: string,
+): Promise<Partial<AccessTokenPayload>> => {
 	try {
 		const key = await importSPKI(publicKey, "RS256");
 		const { payload } = await jwtVerify<AccessTokenPayload>(accessToken, key);
@@ -54,7 +57,7 @@ const verifyToken = async (accessToken: string, publicKey: string): Promise<Part
 
 @Injectable()
 class AccessTypeGuard implements CanActivate {
-	constructor(private readonly reflector: Reflector) {}
+	private readonly reflector = new Reflector();
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const type = this.reflector.get<AccessTypes>(
@@ -74,12 +77,13 @@ class AccessTypeGuard implements CanActivate {
 
 		// For authenticated users
 		if (type === AccessTypes.Auth) {
-			const publicKey = process.env.JWT_PUBLIC_KEY;
+			const publicKeyBase64 = process.env.JWT_PUBLIC_KEY;
 
-			if (!publicKey) {
+			if (!publicKeyBase64) {
 				throw new UnauthorizedException();
 			}
 
+			const publicKey = Buffer.from(publicKeyBase64, "base64").toString("utf8");
 			const { id } = await verifyToken(req.cookies.at, publicKey);
 
 			if (!id) {
