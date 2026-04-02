@@ -1,1 +1,1 @@
-export * from "./Service";
+export * from "./BaseAppService";

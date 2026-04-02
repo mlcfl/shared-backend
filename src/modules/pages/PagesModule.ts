@@ -7,7 +7,9 @@ import {
 	type MiddlewareConsumer,
 	type NestModule,
 } from "@nestjs/common";
+import { APP_FILTER } from "@nestjs/core";
 import express from "express";
+import { PageRedirectFilter } from "../../decorators";
 import { PagesService, FRONTEND_ROOT } from "./PagesService";
 
 /**
@@ -44,6 +46,7 @@ export class PagesModule implements NestModule {
 			module: PagesModule,
 			providers: [
 				{ provide: FRONTEND_ROOT, useValue: frontendRoot },
+				{ provide: APP_FILTER, useClass: PageRedirectFilter },
 				PagesService,
 			],
 			exports: [PagesService],
