@@ -11,7 +11,13 @@
 		"types": "tsc --emitDeclarationOnly",
 		"build": "pnpm types && tsx esbuild.config.ts"
 	},
+	"peerDependencies": {
+		"@nestjs/common": ">=11",
+		"@nestjs/core": ">=11"
+	},
 	"devDependencies": {
+		"@nestjs/common": "^11.1.15",
+		"@nestjs/core": "^11.1.15",
 		"@types/express": "^5.0.1",
 		"@types/node": "^22.14.1",
 		"@types/pg": "^8.11.12",
@@ -20,8 +26,6 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
-		"@nestjs/common": "^11.1.15",
-		"@nestjs/core": "^11.1.15",
 		"@shared/all": "link:../shared-all",
 		"express": "^5.1.0",
 		"jose": "^5.10.0",
